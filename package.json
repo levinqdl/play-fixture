@@ -1,0 +1,21 @@
+{
+  "name": "play-fixture",
+  "version": "0.1.0",
+  "description": "play with playwright fixture",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "repository": "git@github.com:levinqdl/play-fixture.git",
+  "author": "levinqdl <levinqdl@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.32.3",
+    "typescript": "^5.0.4",
+    "vitest": "^0.30.1"
+  },
+  "peerDependencies": {
+    "@playwright/test": "*"
+  },
+  "files": [
+    "dist"
+  ]
+}
