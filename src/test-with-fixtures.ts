@@ -50,7 +50,5 @@ export default <U, const T extends Record<string, FixtureSpec<U>>>(
         {}
       )
     );
-  for (const fixture of fixtures) fixture.describe?.(test);
-
   return test;
 };

@@ -6,7 +6,6 @@ export interface FixtureSpec<T extends unknown = unknown> {
   setup: (...args: any) => Promise<T>;
   teardown: (...args: any) => Promise<T>;
   reserveOnfail?: boolean;
-  describe?: (test: TestType<any, any>) => void;
 }
 
 const workerFixture = <U>(fixture: FixtureSpec<U>, skipTeardownWorkers: Set<string>) => {

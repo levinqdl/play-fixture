@@ -19,11 +19,9 @@ test('test with fixtures', async () => {
         name: 'myFixture',
         setup: vi.fn(),
         teardown: vi.fn(),
-        describe: vi.fn()
     }
     const fn = async () => {}
     vi.mocked(workerFixture).mockImplementationOnce(() => fn)
     const test = fixtureTest({ myFixture })
     expect(base.extend).toHaveBeenNthCalledWith(2, {myFixture: [fn, {scope: 'worker'}]})
-    expect(myFixture.describe).toHaveBeenCalledWith(test)
 })
