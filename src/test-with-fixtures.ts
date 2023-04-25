@@ -1,4 +1,4 @@
-import { Fixtures, test as base } from "@playwright/test";
+import { test as base } from "@playwright/test";
 import workerFixture, { FixtureSpec } from "./workerFixture";
 
 const skipTeardownWorker = new Set<string>();
