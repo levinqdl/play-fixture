@@ -90,8 +90,12 @@ There are several steps to use this package:
     
     Object.values(fixtures).forEach((fixture) => {
       test.describe(fixture.name, () => {
-        test("setup", wrap(fixture.setup));
-        test("teardown", wrap(fixture.teardown));
+        let currentValue
+        const callback = (v) => {
+          // do something with the value
+        }
+        test("setup", wrap(fixture.setup, callback));
+        test("teardown", wrap(fixture.teardown, callback));
       });
     });
     ```
@@ -100,6 +104,7 @@ There are several steps to use this package:
     
     - It hides the return value from the test, which is expected to be `void`.
     - It keeps the destructing object signature of `setup` and `teardown`, which is required by Playwright to parse required fixtures.
+    - You may pass a callback to do something the fixture value
     
 4. Recommended: extend the Playwright configuration to enable only fixture tests in the VSCode extension.
     
