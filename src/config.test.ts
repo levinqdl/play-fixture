@@ -12,6 +12,6 @@ describe('config', () => {
     })
     test('fixture tests are ignored', () => {
         const pwConfig = {}
-        expect(config(pwConfig)).toEqual(Object.assign({}, pwConfig, { testIgnore: ['**/fixtures.spec.ts'] } ))
+        expect(config(pwConfig)).toEqual(Object.assign({}, pwConfig, { testIgnore: [ "**/fixtures.{test,spec}.{ts,js,mjs}"] } ))
     })
 })
