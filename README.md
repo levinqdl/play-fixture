@@ -117,4 +117,4 @@ There are several steps to use this package:
     export default playFixtureConfig(config);
     ```
     
-    This function append `testIgnore: ['**/fixtures.spec.ts']` to playwright config when extension detected.
+    This function append `testIgnore: "**/fixtures.{test,spec}.{ts,js,mjs}"` to playwright config when extension detected.
