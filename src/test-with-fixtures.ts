@@ -1,10 +1,14 @@
 import { test as base } from "@playwright/test";
-import workerFixture, { FixtureSpec } from "./workerFixture";
+import workerFixture, { Callbacks, FixtureSpec } from "./workerFixture";
 
 const skipTeardownWorker = new Set<string>();
 
-export default <U, const T extends Record<string, FixtureSpec<U>>>(
-  fixtureSpecs: T
+export default <
+  T extends Record<string, FixtureSpec<U>>,
+  U = T extends Record<string, FixtureSpec<infer V>> ? V : unknown,
+>(
+  fixtureSpecs: T,
+  callbacks?: Callbacks<U>
 ) => {
   const fixtures = Object.values(fixtureSpecs);
   const test = base
@@ -42,7 +46,7 @@ export default <U, const T extends Record<string, FixtureSpec<U>>>(
         (acc, fixture) => {
           const fixtureName = fixture.name;
           acc[fixtureName] = [
-            workerFixture(fixture, skipTeardownWorker),
+            workerFixture(fixture, skipTeardownWorker, callbacks),
             { scope: "worker" },
           ];
           return acc;
