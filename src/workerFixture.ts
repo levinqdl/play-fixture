@@ -5,7 +5,7 @@ export interface FixtureSpec<T extends unknown = unknown> {
   init?: () => Promise<T>;
   setup: (...args: any) => Promise<T>;
   teardown: (...args: any) => Promise<T>;
-  reserveOnfail?: boolean;
+  reserveOnFail?: boolean;
 }
 
 export interface Callbacks<U, N extends string = string> {
@@ -36,7 +36,7 @@ const workerFixture = <U>(
     await use(value);
     if (
       setuped &&
-      !fixture.reserveOnfail &&
+      !fixture.reserveOnFail &&
       !skipTeardownWorkers.has(fixtureName)
     ) {
       value = await fixture.teardown({ page, [fixture.name]: value });

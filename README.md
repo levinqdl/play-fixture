@@ -41,6 +41,7 @@ There are several steps to use this package:
     - `name`: The fixture name used in destructing params of tests.
     - `setup`: A function to set up the fixture.
     - `teardown`: A function to tear down the fixture.
+    - `reserveOnFail`: Optional, boolean, defaults to `false`. If set to `true`, it will skip the teardown if some tests depend on the fixture and fail.
     
     Example:
     
