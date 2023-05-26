@@ -1,11 +1,11 @@
 import { test as base } from "@playwright/test";
 import workerFixture, { Callbacks, FixtureSpec } from "./workerFixture";
-
-const skipTeardownWorker = new Set<string>();
+import { getFixtures } from "./getFixtures";
+import skippedTeardowns from "./skipped-teardowns";
 
 export default <
   T extends Record<string, FixtureSpec<U>>,
-  U = T extends Record<string, FixtureSpec<infer V>> ? V : unknown,
+  U = T extends Record<string, FixtureSpec<infer V>> ? V : unknown
 >(
   fixtureSpecs: T,
   callbacks?: Callbacks<U>
@@ -16,26 +16,23 @@ export default <
       faillingWithFixture: [
         async ({}, use, testInfo) => {
           await use();
-          function getFixtures(f: any) {
-            const params = f[Object.getOwnPropertySymbols(f)[0]];
-            const fixtureNames = params.filter((p: string) =>
-              fixtures.some((f) => f.name === p)
+
+          const names = fixtures.map((f) => f.name);
+          function markFixturesTeardownSkipped(fn: any) {
+            const fixtureNames = getFixtures(fn).filter((p: string) =>
+              names.some((n) => n === p)
             );
-            return fixtureNames;
+            for (const fixtureName of fixtureNames) {
+              skippedTeardowns.add(fixtureName);
+            }
           }
           if (testInfo.status !== testInfo.expectedStatus) {
             for (const hook of (testInfo as any)._test.parent._hooks) {
               if (hook.type === "beforeEach") {
-                const fixtureNames = getFixtures(hook.fn);
-                for (const fixtureName of fixtureNames) {
-                  skipTeardownWorker.add(fixtureName);
-                }
+                markFixturesTeardownSkipped(hook.fn);
               }
             }
-            const fixtureNames = getFixtures(testInfo.fn);
-            for (const fixtureName of fixtureNames) {
-              skipTeardownWorker.add(fixtureName);
-            }
+            markFixturesTeardownSkipped(testInfo.fn);
           }
         },
         { auto: true },
@@ -46,7 +43,7 @@ export default <
         (acc, fixture) => {
           const fixtureName = fixture.name;
           acc[fixtureName] = [
-            workerFixture(fixture, skipTeardownWorker, callbacks),
+            workerFixture(fixture, skippedTeardowns, callbacks),
             { scope: "worker" },
           ];
           return acc;
