@@ -6,15 +6,17 @@ beforeEach(() => {
 });
 
 describe("worker fixture", () => {
+  const setup = async ({ page, project }) => ({ myFixture: "setup value" });
   const fixture = {
     name: "myFixture",
     setup: vi
       .fn()
-      .mockImplementation(async () => ({ myFixture: "setup value" })),
+      .mockImplementation(setup),
     teardown: vi
       .fn()
-      .mockImplementation(async () => ({ myFixture: "teardown value" })),
+      .mockImplementation(async ({page, project}) => ({ myFixture: "teardown value" })),
   };
+  fixture.setup.toString = () => setup.toString();
   const skipTeardownWorker = new Set<string>();
   const use = vi.fn();
   const browser: any = {
@@ -26,6 +28,7 @@ describe("worker fixture", () => {
     expect(fixture.setup).toHaveBeenCalled();
     expect(use).toHaveBeenCalledWith("setup value");
     expect(fixture.teardown).toHaveBeenCalled();
+    expect(fixtureFu.toString()).contains("{ page, project }")
   });
   describe("callbacks", () => {
     test("teardown & serialize on unserialize return falsy value", async () => {

@@ -25,17 +25,16 @@ const workerFixture = <N extends string, V, T extends { [key in N]: V }>(
   callbacks?: Callbacks<T>
 ) => {
   const fixtureName = fixture.name;
-  return async function (
-    { browser }: { browser: Browser },
+  async function fn(
+    fixtures: any,
     use: (value: V) => Promise<void>
   ) {
-    const page = await browser.newPage();
     let values = await callbacks?.unserialize();
     let setuped = false;
     let value: V | undefined = values?.[fixture.name];
     if (!value) {
       setuped = true;
-      values = await fixture.setup({ page });
+      values = await fixture.setup(fixtures);
       value = values?.[fixture.name];
       console.log(`[fixture setup] ${fixtureName} as ${JSON.stringify(value)}`);
     } else {
@@ -47,13 +46,15 @@ const workerFixture = <N extends string, V, T extends { [key in N]: V }>(
       !fixture.reserveOnFail &&
       !skipTeardownWorkers.has(fixtureName)
     ) {
-      values = await fixture.teardown({ page, [fixture.name]: value });
+      values = await fixture.teardown({ ...fixtures, [fixture.name]: value });
       await callbacks?.serialize(values);
       console.log(
         `[fixture teardown] ${fixtureName} as ${JSON.stringify(value)}`
       );
     }
   };
+  fn.toString = () => fixture.setup.toString()
+  return fn
 };
 
 export default workerFixture;
