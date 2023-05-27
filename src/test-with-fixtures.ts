@@ -3,12 +3,16 @@ import workerFixture, { Callbacks, FixtureSpec } from "./workerFixture";
 import { getFixtures } from "./getFixtures";
 import skippedTeardowns from "./skipped-teardowns";
 
+type ExtractFixtureNames<T extends Record<string, FixtureSpec>> = {
+  [K in keyof T]: T[K] extends FixtureSpec ? T[K]["name"] : never;
+}[keyof T];
+
 export default <
-  T extends Record<string, FixtureSpec<U>>,
-  U = T extends Record<string, FixtureSpec<infer V>> ? V : unknown
+  T extends Record<string, FixtureSpec>,
+  N extends ExtractFixtureNames<T> = ExtractFixtureNames<T>
 >(
   fixtureSpecs: T,
-  callbacks?: Callbacks<U>
+  callbacks?: Callbacks<Record<string, unknown>>
 ) => {
   const fixtures = Object.values(fixtureSpecs);
   const test = base
@@ -39,16 +43,16 @@ export default <
       ],
     })
     .extend(
-      fixtures.reduce<{ [key in FixtureSpec<U>["name"]]: any }>(
+      fixtures.reduce<{ [key in N]: any }>(
         (acc, fixture) => {
-          const fixtureName = fixture.name;
+          const fixtureName = fixture.name as N;
           acc[fixtureName] = [
             workerFixture(fixture, skippedTeardowns, callbacks),
             { scope: "worker" },
           ];
           return acc;
         },
-        {}
+        {} as {[ key in N ]: any}
       )
     );
   return test;

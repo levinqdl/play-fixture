@@ -39,8 +39,8 @@ There are several steps to use this package:
    To create a fixture, create an ES module that exports the following named members:
 
    - `name`: The fixture name used in destructing params of tests.
-   - `setup`: A function to set up the fixture.
-   - `teardown`: A function to tear down the fixture.
+   - `setup`: A function to set up the fixture values.
+   - `teardown`: A function to tear down the fixture values.
    - `reserveOnFail`: Optional, boolean, defaults to `false`. If set to `true`, it will skip the teardown if some tests depend on the fixture and fail.
 
    Example:
@@ -54,13 +54,33 @@ There are several steps to use this package:
      const project = {
        // project info used by other tests
      };
-     return project; // return value is passed to `use`, as fixture value
+     return { project }; // return value is passed to `use`, as fixture value
    };
 
    export const teardown = async ({ page, project }) => {
      // teardown for the project
-     return null; // return new value for other uses
+     return {project: null}; // return new value for other uses
    };
+   ```
+
+   ```tsx
+   export const name = "anotherFixture"
+
+   export const setup = async ({page, project}) => {
+    // setup another fixture here with project
+    return {
+      project,
+      [name]: value
+    }
+   }
+
+   export const teardown = async ({page, project}) => {
+    // teardown for the fixture
+    return {
+      project,
+      [name]: null
+    }
+   }
    ```
 
 2. Extend Playwright tests with fixtures.
